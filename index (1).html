@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQUAD CLASSIC 2026 エントリーフォーム</title>
+  <meta name="description" content="SQUAD CLASSIC 2026 公式エントリーフォーム。2026年8月8日 横浜関内ホール 小ホール開催。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <style>
+    *, *::before, *::after {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'BIZ UDPGothic', Meiryo, 'MS PGothic', sans-serif;
+      box-sizing: border-box; margin: 0; padding: 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: #080c14; color: white; }
+    input, select, textarea { color: white; font-family: inherit; }
+    input::placeholder, textarea::placeholder { color: #475569; }
+    select option { background: #0f172a; color: white; }
+    .page-bg {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 15% 0%, rgba(38,93,183,0.09) 0%, transparent 50%),
+                  radial-gradient(ellipse at 85% 100%, rgba(26,63,143,0.06) 0%, transparent 50%), #080c14;
+    }
+    .hero-section {
+      background: linear-gradient(160deg, #060e1f 0%, #0a0f1e 50%, #080c14 100%);
+      border-bottom: 1px solid rgba(38,93,183,0.18);
+      position: relative; overflow: hidden;
+    }
+    .hero-section::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(38,93,183,0.14) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .blue-line {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #265db7, #60a5fa, #265db7, transparent);
+      max-width: 220px; margin: 18px auto;
+    }
+    .section-title-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px; font-size: 15px; font-weight: 700;
+      color: #265db7; letter-spacing: 0.03em;
+    }
+    .section-title-row::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, rgba(38,93,183,0.35), transparent);
+    }
+    .step-badge {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, #265db7, #1a3f8f);
+      color: white; font-size: 12px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; box-shadow: 0 2px 12px rgba(38,93,183,0.4);
+    }
+    .submit-btn {
+      width: 100%; padding: 18px; border: none; border-radius: 14px;
+      background: linear-gradient(135deg, #265db7, #1a3f8f, #102776);
+      color: white; font-weight: 800; font-size: 16px; letter-spacing: 0.04em;
+      cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(38,93,183,0.35); font-family: inherit;
+    }
+    .submit-btn::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.5s;
+    }
+    .submit-btn:hover::before { left: 100%; }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(38,93,183,0.5); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: rgba(38,93,183,0.4); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    // ============================================================
+    // ★ GASデプロイ後にここのURLを書き換えてください
+    // ============================================================
+    const GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyMx8j7i3jFrPJTZaXr-mQJddjCx_3X65CjZpDshnEfGIYn3y0cJasogor9hsmUi5m7-w/exec";
+
+    const CATEGORIES = [
+      { id: "mens_physique", label: "メンズフィジーク", price: 1500, desc: "" },
+      { id: "wanna_be",      label: "ウォントゥービー",  price: 1500, desc: "比較審査なし・初心者歓迎のクラスです" },
+      { id: "leggings",      label: "レギンス",          price: 1500, desc: "" },
+    ];
+
+    const PREFS = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+
+    const A  = "#265db7";
+    const AL = "rgba(38,93,183,0.15)";
+    const AB = "rgba(38,93,183,0.35)";
+
+    function RadioDot({ checked, color, size = 22 }) {
+      return (
+        <div style={{
+          width: size, height: size, borderRadius: "50%",
+          border: checked ? `2px solid ${color}` : "2px solid rgba(255,255,255,0.18)",
+          background: "rgba(255,255,255,0.03)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0, transition: "all 0.2s",
+          boxShadow: checked ? `0 0 12px ${color}55` : "none",
+        }}>
+          {checked && <div style={{ width: size * 0.45, height: size * 0.45, borderRadius: "50%", background: color }} />}
+        </div>
+      );
+    }
+
+    function CheckBox({ checked, color, size = 22 }) {
+      return (
+        <div style={{
+          width: size, height: size, borderRadius: Math.round(size * 0.28),
+          border: checked ? `2px solid ${color}` : "2px solid rgba(255,255,255,0.18)",
+          background: checked ? color : "rgba(255,255,255,0.03)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0, transition: "all 0.2s",
+          boxShadow: checked ? `0 0 12px ${color}55` : "none",
+        }}>
+          {checked && (
+            <svg width={size * 0.55} height={size * 0.42} viewBox="0 0 12 9" fill="none">
+              <path d="M1 4.5l3.5 3.5 6.5-7.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </div>
+      );
+    }
+
+    function SectionTitle({ step, label }) {
+      return (
+        <div className="section-title-row">
+          <span className="step-badge">{step}</span>
+          {label}
+        </div>
+      );
+    }
+
+    function ErrorBanner({ msg }) {
+      return (
+        <div style={{ marginBottom: 14, padding: "12px 16px", borderRadius: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
+          ⚠️ {msg}
+        </div>
+      );
+    }
+
+    function Badge({ type }) {
+      return type === "required"
+        ? <span style={{ display: "inline-block", fontSize: 10, background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 4, padding: "1px 6px", marginLeft: 6, fontWeight: 500 }}>必須</span>
+        : <span style={{ display: "inline-block", fontSize: 10, background: "rgba(100,116,139,0.15)", color: "#94a3b8", border: "1px solid rgba(100,116,139,0.2)", borderRadius: 4, padding: "1px 6px", marginLeft: 6, fontWeight: 500 }}>任意</span>;
+    }
+
+    function App() {
+      const [selected,  setSelected]  = useState([]);
+      const [payOk,     setPayOk]     = useState(false);
+      const [agreed,    setAgreed]    = useState(false);
+      const [done,      setDone]      = useState(false);
+      const [sending,   setSending]   = useState(false);
+      const [sendErr,   setSendErr]   = useState("");
+      const [errors,    setErrors]    = useState({});
+      const [form, setForm] = useState({
+        lastNameKanji: "", firstNameKanji: "",
+        lastNameKana:  "", firstNameKana:  "",
+        email: "", emailConfirm: "",
+        phone: "",
+        postalCode: "", prefecture: "", city: "", address1: "", address2: "",
+        gym: "", experience: "", selfPr: "",
+      });
+
+      const toggleCat = (id) => {
+        setSelected(p => p.includes(id) ? [] : [id]);
+        if (errors.categories) setErrors(p => ({ ...p, categories: "" }));
+      };
+
+      const total = selected.reduce((s, id) => s + (CATEGORIES.find(c => c.id === id)?.price || 0), 0);
+
+      const onChange = (e) => {
+        const { name, value } = e.target;
+        setForm(p => ({ ...p, [name]: value }));
+        if (errors[name]) setErrors(p => ({ ...p, [name]: "" }));
+      };
+
+      const validate = () => {
+        const e = {};
+        if (!selected.length)    e.categories    = "出場種目を選択してください";
+        if (!form.lastNameKanji)  e.lastNameKanji  = "必須項目です";
+        if (!form.firstNameKanji) e.firstNameKanji = "必須項目です";
+        if (!form.lastNameKana)   e.lastNameKana   = "必須項目です";
+        if (!form.firstNameKana)  e.firstNameKana  = "必須項目です";
+        if (!form.email)          e.email = "必須項目です";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "正しいメールアドレスを入力してください";
+        if (form.email !== form.emailConfirm) e.emailConfirm = "メールアドレスが一致しません";
+        if (!form.phone)      e.phone      = "必須項目です";
+        if (!form.postalCode) e.postalCode = "必須項目です";
+        if (!form.prefecture) e.prefecture = "必須項目です";
+        if (!form.city)       e.city       = "必須項目です";
+        if (!form.address1)   e.address1   = "必須項目です";
+        if (!payOk)           e.payment    = "参加費のお支払いについて確認してください";
+        if (!agreed)          e.agreed     = "規約への同意が必要です";
+        return e;
+      };
+
+      const onSubmit = async (ev) => {
+        ev.preventDefault();
+        const errs = validate();
+        if (Object.keys(errs).length) {
+          setErrors(errs);
+          const key = Object.keys(errs)[0];
+          const el = document.querySelector(`[name="${key}"], [data-section="${key}"]`);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        setSending(true);
+        setSendErr("");
+        const payload = {
+          timestamp:   new Date().toLocaleString("ja-JP"),
+          name:        `${form.lastNameKanji} ${form.firstNameKanji}`,
+          nameKana:    `${form.lastNameKana} ${form.firstNameKana}`,
+          email:       form.email,
+          phone:       form.phone,
+          address:     `〒${form.postalCode} ${form.prefecture}${form.city}${form.address1}${form.address2 ? " " + form.address2 : ""}`,
+          categories:  selected.map(id => CATEGORIES.find(c => c.id === id)?.label).join("、"),
+          totalAmount: `¥${total.toLocaleString()}`,
+          gym:         form.gym        || "未入力",
+          experience:  form.experience || "未入力",
+          selfPr:      form.selfPr     || "未入力",
+          payment:     "紹介者へお支払い（確認済）",
+        };
+        try {
+          await fetch(GAS_WEBHOOK_URL, {
+            method: "POST", mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          setDone(true);
+        } catch {
+          setSendErr("送信に失敗しました。ネットワークを確認のうえ再度お試しください。");
+        } finally {
+          setSending(false);
+        }
+      };
+
+      const inp = (name) => ({
+        width: "100%", padding: "12px 16px", borderRadius: 12,
+        border: errors[name] ? "1.5px solid rgba(239,68,68,0.7)" : "1.5px solid rgba(255,255,255,0.1)",
+        background: errors[name] ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.04)",
+        color: "white", fontSize: 14, outline: "none", transition: "all 0.2s",
+      });
+      const lbl = { display: "block", fontSize: 13, fontWeight: 500, color: "#cbd5e1", marginBottom: 6 };
+      const err = { fontSize: 11, color: "#f87171", marginTop: 6, display: "flex", alignItems: "center", gap: 4 };
+      const sec = { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: 28, marginBottom: 20 };
+
+      if (done) return (
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080c14" }}>
+          <div style={{ textAlign: "center", padding: "48px 24px" }}>
+            <div style={{ width: 96, height: 96, borderRadius: "50%", background: `linear-gradient(135deg, ${A}, #1a3f8f)`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", boxShadow: `0 0 40px rgba(38,93,183,0.45)` }}>
+              <svg width="44" height="36" viewBox="0 0 44 36" fill="none">
+                <path d="M2 18l14 14 26-30" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h2 style={{ fontSize: 28, fontWeight: 900, color: "white", marginBottom: 12 }}>エントリー完了！</h2>
+            <p style={{ color: "#94a3b8", fontSize: 15 }}>ご登録いただいたメールアドレスに確認メールをお送りしました。</p>
+            <p style={{ color: "#64748b", fontSize: 13, marginTop: 8 }}>大会当日のご参加をお待ちしております。</p>
+            <div style={{ marginTop: 32, padding: "16px 28px", borderRadius: 14, background: AL, border: `1px solid ${AB}`, display: "inline-block" }}>
+              <div style={{ color: "#93c5fd", fontSize: 12, marginBottom: 4 }}>選択種目</div>
+              <div style={{ color: "white", fontWeight: 600 }}>{selected.map(id => CATEGORIES.find(c => c.id === id)?.label).join("、")}</div>
+              <div style={{ color: "#60a5fa", fontWeight: 900, fontSize: 22, marginTop: 6 }}>¥{total.toLocaleString()}</div>
+            </div>
+          </div>
+        </div>
+      );
+
+      return (
+        <div className="page-bg">
+          <div className="hero-section">
+            <div style={{ maxWidth: 640, margin: "0 auto", padding: "52px 20px 44px", textAlign: "center", position: "relative", zIndex: 1 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", color: A, textTransform: "uppercase", marginBottom: 14 }}>Official Entry Form</div>
+              <h1 style={{ fontSize: "clamp(30px,7vw,46px)", fontWeight: 900, color: "white", lineHeight: 1.1, letterSpacing: "-0.01em" }}>
+                SQUAD{" "}
+                <span style={{ background: `linear-gradient(135deg, ${A}, #60a5fa)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>CLASSIC</span>
+                {" "}2026
+              </h1>
+              <div className="blue-line" />
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "14px 28px", fontSize: 13, color: "#94a3b8" }}>
+                <span>📅 2026年8月8日（土）</span>
+                <span>📍 横浜関内ホール 小ホール</span>
+              </div>
+              <div style={{ marginTop: 14, display: "inline-block", fontSize: 11, color: "#64748b", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 999, padding: "5px 16px" }}>
+                ⚠️ エントリー締切：2026年4月30日（木）23:59
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={onSubmit} style={{ maxWidth: 640, margin: "0 auto", padding: "28px 16px 60px" }}>
+
+            {/* STEP 1 種目 */}
+            <div style={sec}>
+              <SectionTitle step="1" label="出場種目の選択" />
+              {errors.categories && <ErrorBanner msg={errors.categories} />}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }} data-section="categories">
+                {CATEGORIES.map(cat => {
+                  const sel = selected.includes(cat.id);
+                  return (
+                    <div key={cat.id} onClick={() => toggleCat(cat.id)} style={{ cursor: "pointer", border: sel ? `1.5px solid ${A}` : "1.5px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "15px 18px", background: sel ? AL : "rgba(255,255,255,0.02)", display: "flex", alignItems: "flex-start", gap: 14, transition: "all 0.2s" }}>
+                      <RadioDot checked={sel} color={A} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: "white", fontWeight: 600, fontSize: 14 }}>{cat.label}</div>
+                        {cat.desc && <div style={{ color: "#93c5fd", fontSize: 11, marginTop: 4 }}>📝 {cat.desc}</div>}
+                      </div>
+                      <div style={{ textAlign: "right", flexShrink: 0 }}>
+                        <div style={{ color: sel ? "#60a5fa" : "#94a3b8", fontWeight: 700, fontSize: 14 }}>¥{cat.price.toLocaleString()}</div>
+                        <div style={{ color: "#64748b", fontSize: 10 }}>税込</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {selected.length > 0 && (
+                <div style={{ marginTop: 16, background: `linear-gradient(135deg, rgba(38,93,183,0.1), rgba(26,63,143,0.06))`, border: `1px solid ${AB}`, borderRadius: 14, padding: "16px 22px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ color: "#94a3b8", fontSize: 11, marginBottom: 4 }}>選択中の種目</div>
+                    <div style={{ color: "white", fontSize: 13, fontWeight: 500 }}>{selected.map(id => CATEGORIES.find(c => c.id === id)?.label).join("、")}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ color: "#94a3b8", fontSize: 11 }}>参加費</div>
+                    <div style={{ color: "#60a5fa", fontWeight: 900, fontSize: 24 }}>¥{total.toLocaleString()}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* STEP 2 申込者情報 */}
+            <div style={sec}>
+              <SectionTitle step="2" label="申込者情報" />
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>氏名（漢字）<Badge type="required" /></label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div><input name="lastNameKanji"  placeholder="姓" value={form.lastNameKanji}  onChange={onChange} style={inp("lastNameKanji")}  />{errors.lastNameKanji  && <div style={err}>⚠ {errors.lastNameKanji}</div>}</div>
+                  <div><input name="firstNameKanji" placeholder="名" value={form.firstNameKanji} onChange={onChange} style={inp("firstNameKanji")} />{errors.firstNameKanji && <div style={err}>⚠ {errors.firstNameKanji}</div>}</div>
+                </div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>氏名（カナ）<Badge type="required" /></label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div><input name="lastNameKana"  placeholder="セイ" value={form.lastNameKana}  onChange={onChange} style={inp("lastNameKana")}  />{errors.lastNameKana  && <div style={err}>⚠ {errors.lastNameKana}</div>}</div>
+                  <div><input name="firstNameKana" placeholder="メイ" value={form.firstNameKana} onChange={onChange} style={inp("firstNameKana")} />{errors.firstNameKana && <div style={err}>⚠ {errors.firstNameKana}</div>}</div>
+                </div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>メールアドレス<Badge type="required" /></label>
+                <input type="email" name="email" placeholder="example@mail.com" value={form.email} onChange={onChange} style={inp("email")} />
+                {errors.email && <div style={err}>⚠ {errors.email}</div>}
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>メールアドレス（確認）<Badge type="required" /></label>
+                <input type="email" name="emailConfirm" placeholder="もう一度入力してください" value={form.emailConfirm} onChange={onChange} style={inp("emailConfirm")} />
+                {errors.emailConfirm && <div style={err}>⚠ {errors.emailConfirm}</div>}
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>電話番号<Badge type="required" /></label>
+                <input type="tel" name="phone" placeholder="090-0000-0000" value={form.phone} onChange={onChange} style={inp("phone")} />
+                {errors.phone && <div style={err}>⚠ {errors.phone}</div>}
+              </div>
+              <div>
+                <label style={lbl}>住所<Badge type="required" /></label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <div style={{ width: 150 }}>
+                      <input name="postalCode" placeholder="〒 郵便番号" value={form.postalCode} onChange={onChange} style={inp("postalCode")} />
+                      {errors.postalCode && <div style={err}>⚠ {errors.postalCode}</div>}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <select name="prefecture" value={form.prefecture} onChange={onChange} style={{ ...inp("prefecture"), appearance: "none" }}>
+                        <option value="">都道府県</option>
+                        {PREFS.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                      {errors.prefecture && <div style={err}>⚠ {errors.prefecture}</div>}
+                    </div>
+                  </div>
+                  <div><input name="city" placeholder="市区町村" value={form.city} onChange={onChange} style={inp("city")} />{errors.city && <div style={err}>⚠ {errors.city}</div>}</div>
+                  <div><input name="address1" placeholder="番地・丁目" value={form.address1} onChange={onChange} style={inp("address1")} />{errors.address1 && <div style={err}>⚠ {errors.address1}</div>}</div>
+                  <input name="address2" placeholder="マンション名・部屋番号（任意）" value={form.address2} onChange={onChange} style={inp("address2")} />
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 3 アンケート */}
+            <div style={sec}>
+              <SectionTitle step="3" label="アンケート項目" />
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>所属ジム<Badge type="optional" /></label>
+                <input name="gym" placeholder="例：ANYTIME FITNESS ○○店" value={form.gym} onChange={onChange} style={inp("gym")} />
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>競技歴（年数）<Badge type="optional" /></label>
+                <select name="experience" value={form.experience} onChange={onChange} style={{ ...inp("experience"), appearance: "none" }}>
+                  <option value="">選択してください</option>
+                  {["初参加（0年）","1年未満","1〜3年","3〜5年","5〜10年","10年以上"].map(v => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={lbl}>自己PR<Badge type="optional" /></label>
+                <textarea name="selfPr" rows={4} maxLength={200} placeholder="トレーニングへの思いや意気込みを自由にご記入ください（200文字以内）" value={form.selfPr} onChange={onChange} style={{ ...inp("selfPr"), resize: "vertical", lineHeight: 1.7 }} />
+                <div style={{ textAlign: "right", fontSize: 11, color: "#475569", marginTop: 4 }}>{form.selfPr.length}/200</div>
+              </div>
+            </div>
+
+            {/* STEP 4 お支払い */}
+            <div style={sec}>
+              <SectionTitle step="4" label="参加費のお支払いについて" />
+              {errors.payment && <ErrorBanner msg={errors.payment} />}
+              <div style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 16, fontSize: 13, color: "#94a3b8", lineHeight: 1.9 }}>
+                <div style={{ fontWeight: 600, color: "#cbd5e1", marginBottom: 8, fontSize: 14 }}>💰 参加費のお支払いについて</div>
+                本大会の参加費は、<strong style={{ color: "white" }}>紹介者へ直接お支払い</strong>ください。<br />
+                お支払い方法（現金・PayPay など）は紹介者とご相談のうえ、エントリー締切日までにお済ませください。<br />
+                エントリー後、紹介者よりお支払い方法についてご連絡させていただきます。
+              </div>
+              <div data-section="payment"
+                onClick={() => { setPayOk(p => !p); if (errors.payment) setErrors(p => ({ ...p, payment: "" })); }}
+                style={{ cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 14, padding: "18px 20px", borderRadius: 14, border: payOk ? `1.5px solid ${A}` : "1.5px solid rgba(255,255,255,0.08)", background: payOk ? AL : "rgba(255,255,255,0.02)", transition: "all 0.2s" }}>
+                <CheckBox checked={payOk} color={A} size={24} />
+                <div>
+                  <div style={{ color: "white", fontWeight: 600, fontSize: 14 }}>参加費を紹介者へお支払いすることを確認しました</div>
+                  <div style={{ color: "#64748b", fontSize: 12, marginTop: 4 }}>参加費 ¥{total > 0 ? total.toLocaleString() : "1,500"} ／ お支払い方法は紹介者よりご案内します</div>
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 5 規約 */}
+            <div style={sec}>
+              <SectionTitle step="5" label="規約への同意" />
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: 20, fontSize: 12, color: "#64748b", lineHeight: 1.9, maxHeight: 180, overflowY: "auto", marginBottom: 16 }}>
+                <p style={{ fontWeight: 600, color: "#94a3b8", marginBottom: 10, fontSize: 13 }}>参加規約・注意事項</p>
+                <p>1. 本大会は、フィジーク競技の健全な普及を目的として開催されます。</p>
+                <p>2. 参加者は大会当日までにドーピング検査に対応できる状態であることを誓約するものとします。</p>
+                <p>3. 出場カテゴリーの変更は締切日の5日前までにご連絡ください。</p>
+                <p>4. 大会当日の計測結果によっては出場制限を設ける場合がございます。</p>
+                <p>5. 大会中の映像・写真は主催者の判断により各種媒体で使用される場合があります。</p>
+                <p>6. 参加費の払い戻しは、主催者都合による大会中止の場合を除き行いません。</p>
+                <p>7. 怪我や体調不良による棄権・辞退は速やかにスタッフまでお知らせください。</p>
+                <p>8. 会場内での迷惑行為が認められた場合は、出場資格を剥奪する場合があります。</p>
+                <p style={{ marginTop: 10 }}>個人情報は本大会の運営および今後のご案内にのみ使用し、第三者への提供は行いません。</p>
+              </div>
+              <div onClick={() => { setAgreed(a => !a); if (errors.agreed) setErrors(p => ({ ...p, agreed: "" })); }}
+                style={{ cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 14, padding: "18px 20px", borderRadius: 14, border: agreed ? `1.5px solid ${A}` : "1.5px solid rgba(255,255,255,0.08)", background: agreed ? AL : "rgba(255,255,255,0.02)", transition: "all 0.2s" }}>
+                <CheckBox checked={agreed} color={A} size={24} />
+                <div>
+                  <div style={{ color: "white", fontWeight: 600, fontSize: 14 }}>上記の参加規約・注意事項に同意する</div>
+                  <div style={{ color: "#64748b", fontSize: 12, marginTop: 3 }}>個人情報の取り扱いについても同意するものとします</div>
+                </div>
+              </div>
+              {errors.agreed && <div style={err}>⚠ {errors.agreed}</div>}
+            </div>
+
+            {/* 合計 */}
+            {selected.length > 0 && (
+              <div style={{ background: `linear-gradient(135deg, rgba(38,93,183,0.12), rgba(26,63,143,0.06))`, border: `1px solid ${AB}`, borderRadius: 16, padding: "18px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <div style={{ color: "#94a3b8", fontSize: 13 }}>お支払い合計金額（紹介者へ）</div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ color: "#60a5fa", fontWeight: 900, fontSize: 28 }}>¥{total.toLocaleString()}</div>
+                  <div style={{ color: "#475569", fontSize: 11 }}>税込</div>
+                </div>
+              </div>
+            )}
+
+            {sendErr && (
+              <div style={{ marginBottom: 16, padding: "14px 18px", borderRadius: 12, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#f87171", fontSize: 13 }}>⚠️ {sendErr}</div>
+            )}
+
+            <button type="submit" disabled={sending} className="submit-btn">
+              {sending ? "送信中..." : "エントリーを確定する →"}
+            </button>
+
+            <p style={{ textAlign: "center", fontSize: 11, color: "#475569", marginTop: 16 }}>
+              ご不明な点は <span style={{ color: A }}>info@squad-classic.jp</span> までお問い合わせください
+            </p>
+          </form>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
