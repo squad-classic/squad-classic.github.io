@@ -1,0 +1,1 @@
+# squad-classic.github.io
