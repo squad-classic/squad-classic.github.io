@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -263,7 +264,7 @@
         email: "", emailConfirm: "",
         phone: "",
         postalCode: "", prefecture: "", city: "", address1: "", address2: "",
-        gym: "", experience: "", selfPr: "",
+        gym: "", experience: "", selfPr: "", height: "", weight: "",
       });
 
       const toggleCat = (id) => {
@@ -296,6 +297,9 @@
         if (!form.address1)   e.address1   = "必須項目です";
         if (!payOk)           e.payment    = "参加費のお支払いについて確認してください";
         if (!agreed)          e.agreed     = "規約への同意が必要です";
+        if (!form.height)     e.height     = "必須項目です";
+        if (!form.weight)     e.weight     = "必須項目です";
+        if (!form.experience) e.experience = "必須項目です";
         return e;
       };
 
@@ -323,6 +327,8 @@
           gym:         form.gym        || "未入力",
           experience:  form.experience || "未入力",
           selfPr:      form.selfPr     || "未入力",
+          height:      form.height     ? `${form.height}cm` : "未入力",
+          weight:      form.weight     ? `${form.weight}kg` : "未入力",
           payment:     "紹介者へお支払い（確認済）",
         };
         try {
@@ -491,11 +497,35 @@
                 <input name="gym" placeholder="例：ANYTIME FITNESS ○○店" value={form.gym} onChange={onChange} style={inp("gym")} />
               </div>
               <div style={{ marginBottom: 20 }}>
-                <label style={lbl}>競技歴（年数）<Badge type="optional" /></label>
+                <label style={lbl}>身長 / 体重<Badge type="required" /></label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      name="height" type="number" placeholder="170"
+                      value={form.height} onChange={onChange}
+                      style={{ ...inp("height"), paddingRight: 40 }}
+                    />
+                    <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 13, pointerEvents: "none" }}>cm</span>
+                    {errors.height && <div style={err}>⚠ {errors.height}</div>}
+                  </div>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      name="weight" type="number" placeholder="70"
+                      value={form.weight} onChange={onChange}
+                      style={{ ...inp("weight"), paddingRight: 40 }}
+                    />
+                    <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 13, pointerEvents: "none" }}>kg</span>
+                    {errors.weight && <div style={err}>⚠ {errors.weight}</div>}
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>競技歴（年数）<Badge type="required" /></label>
                 <select name="experience" value={form.experience} onChange={onChange} style={{ ...inp("experience"), appearance: "none" }}>
                   <option value="">選択してください</option>
                   {["初参加（0年）","1年未満","1〜3年","3〜5年","5〜10年","10年以上"].map(v => <option key={v} value={v}>{v}</option>)}
                 </select>
+                {errors.experience && <div style={err}>⚠ {errors.experience}</div>}
               </div>
               <div>
                 <label style={lbl}>自己PR<Badge type="optional" /></label>
