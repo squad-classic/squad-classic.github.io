@@ -183,7 +183,7 @@
 
     const CATEGORIES = [
       { id: "mens_physique", label: "メンズフィジーク", price: 1500, desc: "" },
-      { id: "wanna_be",      label: "ウォントゥービー",  price: 1500, desc: "比較審査なし・初心者歓迎のクラスです" },
+      { id: "wanna_be",      label: "BECOMING SQUAD",  price: 1500, desc: "比較審査なし・初心者歓迎のクラスです" },
       { id: "leggings",      label: "レギンス",          price: 1500, desc: "" },
     ];
 
@@ -265,6 +265,7 @@
         phone: "",
         postalCode: "", prefecture: "", city: "", address1: "", address2: "",
         gym: "", experience: "", selfPr: "", height: "", weight: "",
+        targetWeight: "", idealBody: "", referrer: "",
       });
 
       const toggleCat = (id) => {
@@ -300,6 +301,7 @@
         if (!form.height)     e.height     = "必須項目です";
         if (!form.weight)     e.weight     = "必須項目です";
         if (!form.experience) e.experience = "必須項目です";
+        if (!form.referrer)   e.referrer   = "必須項目です";
         return e;
       };
 
@@ -327,6 +329,9 @@
           gym:         form.gym        || "未入力",
           experience:  form.experience || "未入力",
           selfPr:      form.selfPr     || "未入力",
+          targetWeight: form.targetWeight ? `${form.targetWeight}kg` : "未入力",
+          idealBody:   form.idealBody   || "未入力",
+          referrer:    form.referrer    || "未入力",
           height:      form.height     ? `${form.height}cm` : "未入力",
           weight:      form.weight     ? `${form.weight}kg` : "未入力",
           payment:     "紹介者へお支払い（確認済）",
@@ -497,6 +502,13 @@
                 <input name="gym" placeholder="例：ANYTIME FITNESS ○○店" value={form.gym} onChange={onChange} style={inp("gym")} />
               </div>
               <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>目標体重<Badge type="optional" /></label>
+                <div style={{ position: "relative" }}>
+                  <input name="targetWeight" type="number" placeholder="65" value={form.targetWeight} onChange={onChange} style={{ ...inp("targetWeight"), paddingRight: 40 }} />
+                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 13, pointerEvents: "none" }}>kg</span>
+                </div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
                 <label style={lbl}>身長 / 体重<Badge type="required" /></label>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   <div style={{ position: "relative" }}>
@@ -527,10 +539,19 @@
                 </select>
                 {errors.experience && <div style={err}>⚠ {errors.experience}</div>}
               </div>
-              <div>
+              <div style={{ marginBottom: 20 }}>
                 <label style={lbl}>自己PR<Badge type="optional" /></label>
                 <textarea name="selfPr" rows={4} maxLength={200} placeholder="トレーニングへの思いや意気込みを自由にご記入ください（200文字以内）" value={form.selfPr} onChange={onChange} style={{ ...inp("selfPr"), resize: "vertical", lineHeight: 1.7 }} />
                 <div style={{ textAlign: "right", fontSize: 11, color: "#475569", marginTop: 4 }}>{form.selfPr.length}/200</div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lbl}>理想の身体（理想の人物）<Badge type="optional" /></label>
+                <input name="idealBody" placeholder="例：山岸秀匡、理想は引き締まったフィジーク体型" value={form.idealBody} onChange={onChange} style={inp("idealBody")} />
+              </div>
+              <div>
+                <label style={lbl}>紹介者<Badge type="required" /></label>
+                <input name="referrer" placeholder="例：田中 太郎" value={form.referrer} onChange={onChange} style={inp("referrer")} />
+                {errors.referrer && <div style={err}>⚠ {errors.referrer}</div>}
               </div>
             </div>
 
@@ -624,4 +645,3 @@
   </script>
 </body>
 </html>
-
